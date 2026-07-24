@@ -165,8 +165,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"mongodb\"\n  url      = env(\"MONGODB_URI\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\nmodel User {\n  id           String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  createdAt    DateTime @default(now())\n  email        String   @unique\n  name         String\n  passwordHash String\n  todos        Todo[]\n}\n\nmodel Todo {\n  id        String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  name      String\n  completed Boolean  @default(false)\n  createdAt DateTime @default(now())\n  userId    String   @db.ObjectId\n  user      User     @relation(fields: [userId], references: [id])\n}\n",
-  "inlineSchemaHash": "a294faeaaf5aa2710e9599f0bcb2cabf4371baa8b0e9972c3abb760f7d5bc073",
+  "inlineSchema": "datasource db {\n  provider = \"mongodb\"\n  url      = env(\"MONGODB_URI\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\nmodel User {\n  id           String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  createdAt    DateTime @default(now())\n  email        String   @unique\n  name         String?\n  passwordHash String\n  todos        Todo[]\n}\n\nmodel Todo {\n  id        String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  name      String\n  completed Boolean  @default(false)\n  createdAt DateTime @default(now())\n  userId    String   @db.ObjectId\n  user      User     @relation(fields: [userId], references: [id])\n}\n",
+  "inlineSchemaHash": "bae4edff3aeb6a531d487abc22c9f857bbc8c0206325704c975f82adfa2c47e2",
   "copyEngine": true
 }
 config.dirname = '/'

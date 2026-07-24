@@ -12,7 +12,7 @@ model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt    DateTime @default(now())
   email        String   @unique
-  name         String
+  name         String?
   passwordHash String
   todos        Todo[]
 }
