@@ -112,6 +112,7 @@ export default function Home() {
       // ignore
     } finally {
       localStorage.removeItem("auth_token");
+      delete api.defaults.headers.common.Authorization;
       setToken(null);
       setUser(null);
       setMessageType("success");
@@ -143,9 +144,11 @@ export default function Home() {
     void handleLogout();
   };
 
+  const shouldShowLogout = Boolean(token && mode !== "register");
+
   const navItems = [
     { label: "Home", action: "home" as const },
-    ...(token
+    ...(shouldShowLogout
       ? [{ label: "Logout", action: "logout" as const }]
       : [
           { label: "Register", action: "register" as const },
@@ -233,7 +236,7 @@ export default function Home() {
             <ListItemButton onClick={() => handleNavAction("home")} sx={{ borderRadius: 2 }}>
               <ListItemText primary="Home" />
             </ListItemButton>
-            {!token ? (
+            {!shouldShowLogout ? (
               <>
                 <ListItemButton onClick={() => handleNavAction("register")} sx={{ borderRadius: 2 }}>
                   <ListItemText primary="Register" />
