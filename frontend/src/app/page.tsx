@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
+  Alert,
   AppBar,
   Box,
   Button,
@@ -292,9 +293,9 @@ export default function Home() {
               </Typography>
 
               {message ? (
-                <Typography color={messageType === "error" ? "error" : "primary"} variant="body2">
+                <Alert severity={messageType} variant="outlined">
                   {message}
-                </Typography>
+                </Alert>
               ) : null}
 
               {!token ? (
