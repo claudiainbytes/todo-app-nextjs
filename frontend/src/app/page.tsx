@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Alert,
   AppBar,
@@ -24,15 +23,14 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
+import {
+  authService,
+  clearAuthToken,
+  getApiErrorMessage,
+  setAuthToken,
+  type User,
+} from "@/services/authService";
 
-type User = {
-  id: string;
-  email: string;
-  name?: string | null;
-  createdAt: string;
-};
-
-const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL });
 export default function Home() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
@@ -54,21 +52,20 @@ export default function Home() {
     const savedToken = window.localStorage.getItem("auth_token");
     if (savedToken) {
       setToken(savedToken);
-      api.defaults.headers.common.Authorization = `Bearer ${savedToken}`;
+      setAuthToken(savedToken);
       loadProfile(savedToken);
     }
   }, []);
 
   const loadProfile = async (authToken: string) => {
     try {
-      const response = await api.get("/auth/me", {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      setUser(response.data);
+      const profile = await authService.getProfile(authToken);
+      setUser(profile);
     } catch {
       setMessageType("error");
       setMessage("Session expired. Please login again.");
       localStorage.removeItem("auth_token");
+      clearAuthToken();
       setToken(null);
     }
   };
@@ -79,25 +76,22 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      const endpoint = mode === "login" ? "/auth/login" : "/auth/register";
-      const payload = mode === "login" ? { email, password } : { email, password, name };
-      const response = await api.post(endpoint, payload);
-
       if (mode === "login") {
-        const authToken = response.data.accessToken;
-        localStorage.setItem("auth_token", authToken);
-        api.defaults.headers.common.Authorization = `Bearer ${authToken}`;
-        setToken(authToken);
-        setUser(response.data.user);
+        const { accessToken, user: loggedUser } = await authService.login({ email, password });
+        localStorage.setItem("auth_token", accessToken);
+        setAuthToken(accessToken);
+        setToken(accessToken);
+        setUser(loggedUser);
         setMessageType("success");
         setMessage("Login successful");
       } else {
+        await authService.register({ email, password, name });
         setMode("login");
         setMessageType("success");
         setMessage("Registration successful. Please login.");
       }
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message ?? error?.message ?? "Operation failed";
+    } catch (error) {
+      const backendMessage = getApiErrorMessage(error);
       setMessageType("error");
       setMessage(backendMessage);
     } finally {
@@ -107,12 +101,12 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await api.post("/auth/logout");
+      await authService.logout();
     } catch {
       // ignore
     } finally {
       localStorage.removeItem("auth_token");
-      delete api.defaults.headers.common.Authorization;
+      clearAuthToken();
       setToken(null);
       setUser(null);
       setMessageType("success");
