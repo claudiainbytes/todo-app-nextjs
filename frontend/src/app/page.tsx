@@ -32,8 +32,7 @@ type User = {
   createdAt: string;
 };
 
-const api = axios.create({ baseURL: "http://localhost:4000" });
-
+const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL });
 export default function Home() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
