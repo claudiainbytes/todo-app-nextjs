@@ -21,11 +21,16 @@ type LoginResponse = {
   user: User;
 };
 
+type RegisterResponse = {
+  message: string;
+  user: User;
+};
+
 type ErrorResponse = {
   message?: string;
 };
 
-const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL });
+export const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL });
 
 export const setAuthToken = (token: string) => {
   api.defaults.headers.common.Authorization = `Bearer ${token}`;
@@ -54,7 +59,7 @@ export const authService = {
   },
 
   register: async (payload: RegisterPayload) => {
-    const response = await api.post<User>("/auth/register", payload);
+    const response = await api.post<RegisterResponse>("/auth/register", payload);
     return response.data;
   },
 

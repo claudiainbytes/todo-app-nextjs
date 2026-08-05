@@ -1,1 +1,11 @@
-export class CreateTodoDto {}
+import { IsBoolean, IsOptional, IsString, MinLength } from 'class-validator';
+
+export class CreateTodoDto {
+  @IsString()
+  @MinLength(1)
+  name: string;
+
+  @IsBoolean()
+  @IsOptional()
+  flag?: boolean;
+}
