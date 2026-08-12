@@ -1,53 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Alert,
-  AppBar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Checkbox,
-  CircularProgress,
-  Container,
-  Drawer,
-  IconButton,
-  List,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  TextField,
-  Toolbar,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import EditIcon from "@mui/icons-material/Edit";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import LogoutIcon from "@mui/icons-material/Logout";
-import MenuIcon from "@mui/icons-material/Menu";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import {
-  authService,
-  clearAuthToken,
-  getApiErrorMessage,
-  setAuthToken,
-  type User,
-} from "@/services/authService";
+import { Alert, Box, Container, Card, CardContent, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { authService, clearAuthToken, getApiErrorMessage, setAuthToken, type User } from "@/services/authService";
 import { todoService, type Todo } from "@/services/todoService";
+import { Navbar } from "@/components/navbar";
+import { AuthForm } from "@/components/auth-form";
+import { TodosPanel } from "@/components/todos-panel";
+
+type Mode = "login" | "register";
+type MessageType = "success" | "error";
+type NavAction = "home" | "register" | "login" | "logout";
 
 export default function Home() {
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const primaryTextColor = "#111827";
+  const secondaryTextColor = "#334155";
+  const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">("success");
+  const [messageType, setMessageType] = useState<MessageType>("success");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -74,7 +49,7 @@ export default function Home() {
     }
   }, []);
 
-  const showMessage = (type: "success" | "error", text: string) => {
+  const showMessage = (type: MessageType, text: string) => {
     setMessageType(type);
     setMessage(text);
   };
@@ -218,7 +193,7 @@ export default function Home() {
     }
   };
 
-  const handleNavAction = (action: "home" | "register" | "login" | "logout") => {
+  const handleNavAction = (action: NavAction) => {
     setMobileNavOpen(false);
     setMessage("");
 
@@ -254,192 +229,79 @@ export default function Home() {
   if (!isHydrated) {
     return (
       <Container maxWidth="sm" sx={{ py: 6 }}>
-        <Card variant="outlined">
-          <CardContent sx={{ p: 4, textAlign: "center" }}>
-            <Typography color="text.secondary">Loading...</Typography>
-          </CardContent>
-        </Card>
-      </Container>
+          <Card variant="outlined">
+            <CardContent sx={{ p: 4, textAlign: "center" }}>
+            <Typography sx={{ color: secondaryTextColor, fontWeight: 600 }}>Loading...</Typography>
+            </CardContent>
+          </Card>
+        </Container>
     );
   }
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <AppBar position="sticky" color="transparent" elevation={0} sx={{ borderBottom: 1, borderColor: "divider", bgcolor: "background.paper" }}>
-        <Toolbar sx={{ px: { xs: 2, sm: 3 }, gap: 2 }}>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 800 }}>
-              Todo Auth
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {token ? `Signed in as ${user?.name ?? user?.email}` : "Authenticate and continue"}
-            </Typography>
-          </Box>
-
-          {isMobile ? (
-            <IconButton aria-label="open navigation menu" onClick={() => setMobileNavOpen(true)}>
-              <MenuIcon />
-            </IconButton>
-          ) : (
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-              {navItems.map((item) => (
-                <Button key={item.label} color="inherit" onClick={() => handleNavAction(item.action)} sx={{ color: "text.primary", textTransform: "none" }}>
-                  {item.label}
-                </Button>
-              ))}
-            </Stack>
-          )}
-        </Toolbar>
-      </AppBar>
-
-      <Drawer anchor="right" open={mobileNavOpen} onClose={() => setMobileNavOpen(false)}>
-        <Box sx={{ width: 280, p: 2.5 }}>
-          <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
-            Navigation
-          </Typography>
-          <List>
-            {navItems.map((item) => (
-              <ListItemButton key={item.label} onClick={() => handleNavAction(item.action)} sx={{ borderRadius: 2 }}>
-                <ListItemText primary={item.label} />
-              </ListItemButton>
-            ))}
-          </List>
-        </Box>
-      </Drawer>
+      <Navbar
+        token={token}
+        userLabel={user?.name ?? user?.email}
+        isMobile={isMobile}
+        mobileNavOpen={mobileNavOpen}
+        navItems={navItems}
+        onOpenMobileNav={() => setMobileNavOpen(true)}
+        onCloseMobileNav={() => setMobileNavOpen(false)}
+        onNavAction={handleNavAction}
+      />
 
       <Container maxWidth={token ? "md" : "sm"} sx={{ py: { xs: 3, md: 6 } }}>
         {message ? (
-          <Alert severity={messageType} variant="outlined" sx={{ mb: 2 }}>
+          <Alert
+            severity={messageType}
+            variant="outlined"
+            sx={{
+              mb: 2,
+              "& .MuiAlert-message": { color: primaryTextColor, fontWeight: 600 },
+            }}
+          >
             {message}
           </Alert>
         ) : null}
 
         {!token ? (
-          <Card elevation={0} sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
-            <CardContent sx={{ p: 4 }}>
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                <Box sx={{ width: 48, height: 48, borderRadius: "50%", display: "grid", placeItems: "center", bgcolor: "primary.main", color: "white" }}>
-                  <LockOutlinedIcon />
-                </Box>
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                  {mode === "login" ? "Welcome back" : "Create account"}
-                </Typography>
-                <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-                  <Stack spacing={1.5}>
-                    {mode === "register" ? <TextField label="Name" value={name} onChange={(event) => setName(event.target.value)} fullWidth /> : null}
-                    <TextField label="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} fullWidth required />
-                    <TextField label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} fullWidth required />
-                    <Button type="submit" variant="contained" fullWidth disabled={isSubmitting} sx={{ mt: 1 }}>
-                      {isSubmitting ? "Working..." : mode === "login" ? "Sign in" : "Create account"}
-                    </Button>
-                    <Button variant="text" onClick={() => setMode(mode === "login" ? "register" : "login")}>
-                      {mode === "login" ? "Need an account?" : "Already have an account?"}
-                    </Button>
-                  </Stack>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
+          <AuthForm
+            mode={mode}
+            email={email}
+            name={name}
+            password={password}
+            isSubmitting={isSubmitting}
+            onSubmit={handleSubmit}
+            onModeChange={setMode}
+            onEmailChange={setEmail}
+            onNameChange={setName}
+            onPasswordChange={setPassword}
+          />
         ) : (
-          <Stack spacing={2.5}>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ justifyContent: "space-between", alignItems: { xs: "stretch", sm: "center" } }}>
-              <Box>
-                <Typography variant="h4" sx={{ fontWeight: 800 }}>
-                  Todos
-                </Typography>
-                <Typography color="text.secondary">{user?.email}</Typography>
-              </Box>
-              <Button variant="outlined" startIcon={<LogoutIcon />} onClick={() => void handleLogout()}>
-                Logout
-              </Button>
-            </Stack>
-
-            <Card elevation={0} sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
-              <CardContent>
-                <Box component="form" onSubmit={handleCreateTodo}>
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ alignItems: { xs: "stretch", sm: "center" } }}>
-                    <TextField label="Todo name" value={todoName} onChange={(event) => setTodoName(event.target.value)} fullWidth required />
-                    <Box sx={{ display: "flex", alignItems: "center", minWidth: 118 }}>
-                      <Checkbox checked={todoFlag} onChange={(event) => setTodoFlag(event.target.checked)} slotProps={{ input: { "aria-label": "Todo flag" } }} />
-                      <Typography>Flag</Typography>
-                    </Box>
-                    <Button type="submit" variant="contained" startIcon={<AddIcon />} disabled={isSubmitting || !todoName.trim()} sx={{ minWidth: 120 }}>
-                      Add
-                    </Button>
-                  </Stack>
-                </Box>
-              </CardContent>
-            </Card>
-
-            <Card elevation={0} sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}>
-              <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-                {isTodosLoading ? (
-                  <Box sx={{ display: "grid", placeItems: "center", py: 5 }}>
-                    <CircularProgress size={28} />
-                  </Box>
-                ) : todos.length === 0 ? (
-                  <Typography color="text.secondary" sx={{ p: 2, textAlign: "center" }}>
-                    No todos yet.
-                  </Typography>
-                ) : (
-                  <Stack spacing={1}>
-                    {todos.map((todo) => {
-                      const isEditing = editingId === todo.id;
-                      const isBusy = busyTodoId === todo.id;
-
-                      return (
-                        <Box key={todo.id} sx={{ display: "grid", gridTemplateColumns: { xs: "auto 1fr", sm: "auto 1fr auto" }, gap: 1, alignItems: "center", p: 1, border: 1, borderColor: "divider", borderRadius: 2 }}>
-                          <Checkbox
-                            checked={isEditing ? editingFlag : todo.flag}
-                            disabled={isBusy}
-                            onChange={(event) => {
-                              if (isEditing) {
-                                setEditingFlag(event.target.checked);
-                              } else {
-                                void handleToggleTodo(todo, event.target.checked);
-                              }
-                            }}
-                            slotProps={{ input: { "aria-label": `Flag ${todo.name}` } }}
-                          />
-                          {isEditing ? (
-                            <TextField size="small" value={editingName} onChange={(event) => setEditingName(event.target.value)} fullWidth />
-                          ) : (
-                            <Box sx={{ minWidth: 0 }}>
-                              <Typography sx={{ fontWeight: 600, overflowWrap: "anywhere" }}>{todo.name}</Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                Flag: {todo.flag ? "true" : "false"}
-                              </Typography>
-                            </Box>
-                          )}
-                          <Stack direction="row" spacing={0.5} sx={{ gridColumn: { xs: "1 / -1", sm: "auto" }, justifyContent: "flex-end" }}>
-                            {isEditing ? (
-                              <>
-                                <Button size="small" onClick={() => setEditingId(null)} disabled={isBusy}>
-                                  Cancel
-                                </Button>
-                                <IconButton aria-label="save todo" color="primary" disabled={isBusy || !editingName.trim()} onClick={() => void handleUpdateTodo(todo.id)}>
-                                  <SaveOutlinedIcon />
-                                </IconButton>
-                              </>
-                            ) : (
-                              <>
-                                <IconButton aria-label="edit todo" disabled={isBusy} onClick={() => handleStartEdit(todo)}>
-                                  <EditIcon />
-                                </IconButton>
-                                <IconButton aria-label="delete todo" color="error" disabled={isBusy} onClick={() => void handleDeleteTodo(todo.id)}>
-                                  <DeleteOutlinedIcon />
-                                </IconButton>
-                              </>
-                            )}
-                          </Stack>
-                        </Box>
-                      );
-                    })}
-                  </Stack>
-                )}
-              </CardContent>
-            </Card>
-          </Stack>
+          <TodosPanel
+            userEmail={user?.email}
+            todos={todos}
+            todoName={todoName}
+            todoFlag={todoFlag}
+            editingId={editingId}
+            editingName={editingName}
+            editingFlag={editingFlag}
+            isSubmitting={isSubmitting}
+            isTodosLoading={isTodosLoading}
+            busyTodoId={busyTodoId}
+            onLogout={() => void handleLogout()}
+            onTodoNameChange={setTodoName}
+            onTodoFlagChange={setTodoFlag}
+            onCreateTodo={handleCreateTodo}
+            onStartEdit={handleStartEdit}
+            onEditingNameChange={setEditingName}
+            onEditingFlagChange={setEditingFlag}
+            onCancelEdit={() => setEditingId(null)}
+            onUpdateTodo={(id) => void handleUpdateTodo(id)}
+            onToggleTodo={(todo, flag) => void handleToggleTodo(todo, flag)}
+            onDeleteTodo={(id) => void handleDeleteTodo(id)}
+          />
         )}
       </Container>
     </Box>
