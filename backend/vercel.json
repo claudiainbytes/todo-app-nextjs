@@ -17,7 +17,7 @@
             }
         },
         {
-            "source": "/(.*)",
+            "source": "/frontend(.*)",
             "destination": {
                 "type": "service",
                 "service": "frontend"
