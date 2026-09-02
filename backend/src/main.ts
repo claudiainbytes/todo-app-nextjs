@@ -13,6 +13,7 @@ async function bootstrap() {
   );
   app.enableCors({
     origin: [process.env.CORS_BASE_URL_1, process.env.CORS_BASE_URL_2],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
   });
   await app.listen(process.env.PORT ?? 4000);
