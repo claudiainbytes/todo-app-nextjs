@@ -11,12 +11,14 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  app.enableCors({
-    origin: [process.env.CORS_BASE_URL_1, process.env.CORS_BASE_URL_2],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+   const options = {
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
     credentials: true,
-  });
+    allowedHeaders: 'Content-Type, Accept',
+  };
+  app.enableCors(options);
   await app.listen(process.env.PORT ?? 4000);
 }
 bootstrap();
