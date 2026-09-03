@@ -11,8 +11,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  console.log('CORS_BASE_URL_1:', process.env.CORS_BASE_URL_1);
-  console.log('CORS_BASE_URL_2:', process.env.CORS_BASE_URL_2);
   app.enableCors({
     origin: [process.env.CORS_BASE_URL_1, process.env.CORS_BASE_URL_2],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
