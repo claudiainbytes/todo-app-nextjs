@@ -36,12 +36,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.19.0
- * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
+ * Prisma Client JS version: 6.19.3
+ * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
  */
 Prisma.prismaVersion = {
-  client: "6.19.0",
-  engine: "2ba551f319ab1df4bc874a89965d8b3641056773"
+  client: "6.19.3",
+  engine: "c2990dca591cba766e3b7ef5d9e8a84796e47ab7"
 }
 
 Prisma.PrismaClientKnownRequestError = PrismaClientKnownRequestError;
@@ -139,6 +139,10 @@ const config = {
         "fromEnvVar": null,
         "value": "debian-openssl-3.0.x",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -150,8 +154,8 @@ const config = {
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
-  "clientVersion": "6.19.0",
-  "engineVersion": "2ba551f319ab1df4bc874a89965d8b3641056773",
+  "clientVersion": "6.19.3",
+  "engineVersion": "c2990dca591cba766e3b7ef5d9e8a84796e47ab7",
   "datasourceNames": [
     "db"
   ],
@@ -165,8 +169,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"mongodb\"\n  url      = env(\"MONGODB_URI\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\nmodel User {\n  id           String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  createdAt    DateTime @default(now())\n  email        String   @unique\n  name         String?\n  passwordHash String\n  todos        Todo[]\n}\n\nmodel Todo {\n  id        String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  name      String\n  completed Boolean  @default(false)\n  createdAt DateTime @default(now())\n  userId    String   @db.ObjectId\n  user      User     @relation(fields: [userId], references: [id])\n}\n",
-  "inlineSchemaHash": "bae4edff3aeb6a531d487abc22c9f857bbc8c0206325704c975f82adfa2c47e2",
+  "inlineSchema": "datasource db {\n  provider = \"mongodb\"\n  url      = env(\"MONGODB_URI\")\n}\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/prisma\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\nmodel User {\n  id           String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  createdAt    DateTime @default(now())\n  email        String   @unique\n  name         String?\n  passwordHash String\n  todos        Todo[]\n}\n\nmodel Todo {\n  id        String   @id @default(auto()) @map(\"_id\") @db.ObjectId\n  name      String\n  completed Boolean  @default(false)\n  createdAt DateTime @default(now())\n  userId    String   @db.ObjectId\n  user      User     @relation(fields: [userId], references: [id])\n}\n",
+  "inlineSchemaHash": "41d62994b061d8bb4a4e50787ff65e93b148bbe3ebc86c4473cc5447f8625fff",
   "copyEngine": true
 }
 config.dirname = '/'
